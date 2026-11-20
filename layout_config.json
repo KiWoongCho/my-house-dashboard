@@ -1,0 +1,544 @@
+{
+  "savedAt": "2026-08-23T14:15:00.000Z",
+  "version": "4.0-perfect-architectural-alignment",
+  "description": "광주 광산구 하남2지구 중흥S클래스 ***동 ***호 84A 확장형 마스터 평면도 및 기기 배치 포맷",
+  "overlayLayout": [
+    {
+      "id": "common_bath",
+      "name": "공동 화장실",
+      "icon": "🚿",
+      "color": "border-cyan-400 text-cyan-200",
+      "matchKeys": [
+        "공동화장실",
+        "공용화장실",
+        "공동"
+      ],
+      "xPct": 1.5,
+      "yPct": 37.0,
+      "wPct": 10.5,
+      "hPct": 24.5,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "entrance",
+      "name": "현관",
+      "icon": "👟",
+      "color": "border-lime-400 text-lime-200",
+      "matchKeys": [
+        "현관",
+        "신발장",
+        "중문"
+      ],
+      "xPct": 12.2,
+      "yPct": 21.5,
+      "wPct": 11.5,
+      "hPct": 29.0,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "room3",
+      "name": "방3 (침실3)",
+      "icon": "🚪",
+      "color": "border-amber-400 text-amber-200",
+      "matchKeys": [
+        "방3",
+        "침실3",
+        "작은방"
+      ],
+      "xPct": 24.0,
+      "yPct": 11.0,
+      "wPct": 16.5,
+      "hPct": 38.0,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "kitchen",
+      "name": "주방 / 식당",
+      "icon": "🍳",
+      "color": "border-emerald-400 text-emerald-200",
+      "matchKeys": [
+        "주방",
+        "식당"
+      ],
+      "xPct": 44.5,
+      "yPct": 2.5,
+      "wPct": 18.5,
+      "hPct": 49.0,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "balcony",
+      "name": "발코니 / 다용도실",
+      "icon": "🧺",
+      "color": "border-rose-400 text-rose-200",
+      "matchKeys": [
+        "발코니",
+        "다용도실",
+        "세탁실",
+        "실외기실"
+      ],
+      "xPct": 63.5,
+      "yPct": 2.5,
+      "wPct": 20.0,
+      "hPct": 24.0,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "master_bath",
+      "name": "안방 욕실",
+      "icon": "🛁",
+      "color": "border-teal-400 text-teal-200",
+      "matchKeys": [
+        "안방화장실",
+        "부부욕실",
+        "안방 욕실",
+        "안방 화장실"
+      ],
+      "xPct": 63.5,
+      "yPct": 27.5,
+      "wPct": 9.8,
+      "hPct": 23.5,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "dressroom",
+      "name": "드레스룸",
+      "icon": "👔",
+      "color": "border-purple-400 text-purple-200",
+      "matchKeys": [
+        "드레스룸",
+        "파우더룸"
+      ],
+      "xPct": 73.5,
+      "yPct": 27.5,
+      "wPct": 10.0,
+      "hPct": 23.5,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "room1",
+      "name": "방1 (은찬방)",
+      "icon": "🚪",
+      "color": "border-amber-400 text-amber-200",
+      "matchKeys": [
+        "은찬방",
+        "방1"
+      ],
+      "xPct": 12.2,
+      "yPct": 62.0,
+      "wPct": 14.5,
+      "hPct": 26.5,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "room2",
+      "name": "방2 (은빈방)",
+      "icon": "🚪",
+      "color": "border-yellow-400 text-yellow-200",
+      "matchKeys": [
+        "은빈방",
+        "방2"
+      ],
+      "xPct": 27.0,
+      "yPct": 62.0,
+      "wPct": 14.5,
+      "hPct": 26.5,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "living",
+      "name": "거실",
+      "icon": "🛋️",
+      "color": "border-blue-400 text-blue-200",
+      "matchKeys": [
+        "거실"
+      ],
+      "xPct": 41.8,
+      "yPct": 52.5,
+      "wPct": 21.2,
+      "hPct": 36.0,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "master_bed",
+      "name": "안방 (침실1)",
+      "icon": "🛏️",
+      "color": "border-indigo-400 text-indigo-200",
+      "matchKeys": [
+        "안방",
+        "침실1",
+        "마스터룸"
+      ],
+      "xPct": 63.5,
+      "yPct": 52.5,
+      "wPct": 20.0,
+      "hPct": 23.5,
+      "labelPos": "bottom"
+    },
+    {
+      "id": "master_balcony",
+      "name": "안방 발코니",
+      "icon": "🌿",
+      "color": "border-emerald-400 text-emerald-200",
+      "matchKeys": [
+        "안방발코니",
+        "베란다",
+        "발코니"
+      ],
+      "xPct": 63.5,
+      "yPct": 76.5,
+      "wPct": 20.0,
+      "hPct": 12.0,
+      "labelPos": "bottom"
+    }
+  ],
+  "items": [
+    {
+      "id": "st-1",
+      "name": "시스템에어컨 (거실)",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "DVM Home 4Way",
+      "purchaseDate": "2013-09-01",
+      "location": "거실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "시스템 프리필터",
+      "repairNotes": "정기 세척 완료 / 냉매 압력 정상",
+      "repairHistory": [
+        {
+          "date": "2026-05-10",
+          "desc": "초여름 맞이 필터 세척 및 가동 점검"
+        }
+      ]
+    },
+    {
+      "id": "st-2",
+      "name": "시스템에어컨 (안방)",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "DVM Home 1Way",
+      "purchaseDate": "2013-09-01",
+      "location": "안방 (침실1)",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "시스템 프리필터",
+      "repairNotes": "정기 세척 완료",
+      "repairHistory": [
+        {
+          "date": "2026-05-10",
+          "desc": "필터 물세척 및 건조"
+        }
+      ]
+    },
+    {
+      "id": "st-3",
+      "name": "시스템에어컨 (방1)",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "DVM Home 1Way",
+      "purchaseDate": "2013-09-01",
+      "location": "방1 (은찬방)",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "시스템 프리필터",
+      "repairNotes": "정기 세척 완료",
+      "repairHistory": []
+    },
+    {
+      "id": "st-4",
+      "name": "시스템에어컨 (방2)",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "DVM Home 1Way",
+      "purchaseDate": "2013-09-01",
+      "location": "방2 (은빈방)",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "시스템 프리필터",
+      "repairNotes": "정기 세척 완료",
+      "repairHistory": []
+    },
+    {
+      "id": "st-5",
+      "name": "시스템에어컨 (방3)",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "DVM Home 1Way",
+      "purchaseDate": "2013-09-01",
+      "location": "방3 (침실3)",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "시스템 프리필터",
+      "repairNotes": "정기 세척 완료",
+      "repairHistory": []
+    },
+    {
+      "id": "st-6",
+      "name": "비스포크 4도어 냉장고 (정수기)",
+      "category": "kitchen",
+      "brand": "삼성전자",
+      "modelNumber": "RF85T9111AP",
+      "purchaseDate": "2021-05-15",
+      "location": "주방 / 식당",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "정수 필터 HAF-QIN",
+      "repairNotes": "정수 필터 정기 교체 관리",
+      "repairHistory": [
+        {
+          "date": "2026-03-15",
+          "desc": "정수기 정품 필터 교체"
+        }
+      ]
+    },
+    {
+      "id": "st-7",
+      "name": "비스포크 그랑데 AI 세탁기",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "WF24T9500KE",
+      "purchaseDate": "2021-08-20",
+      "location": "발코니 / 다용도실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "배수 필터",
+      "repairNotes": "무세제 통세척 코스 권장",
+      "repairHistory": [
+        {
+          "date": "2026-06-01",
+          "desc": "배수 거름망 이물질 청소"
+        }
+      ]
+    },
+    {
+      "id": "st-8",
+      "name": "비스포크 그랑데 AI 건조기",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "DV17T9720SE",
+      "purchaseDate": "2021-08-20",
+      "location": "발코니 / 다용도실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "올인원 필터 / 열교환기",
+      "repairNotes": "열교환기 솔 청소 완료",
+      "repairHistory": []
+    },
+    {
+      "id": "st-9",
+      "name": "비스포크 식기세척기 12인용",
+      "category": "kitchen",
+      "brand": "삼성전자",
+      "modelNumber": "DW60A8375AP",
+      "purchaseDate": "2022-03-10",
+      "location": "주방 / 식당",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "스테인리스 노즐 / 거름망",
+      "repairNotes": "구연산 내부 통살균 세척",
+      "repairHistory": []
+    },
+    {
+      "id": "st-10",
+      "name": "비스포크 큐브 에어 공기청정기 (거실)",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "AX53A9310GED",
+      "purchaseDate": "2022-04-12",
+      "location": "거실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "일체형 집진 탈취필터",
+      "repairNotes": "필터 수명 82%",
+      "repairHistory": []
+    },
+    {
+      "id": "st-11",
+      "name": "비스포크 큐브 에어 공기청정기 (안방)",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "AX53A9310GED",
+      "purchaseDate": "2022-04-12",
+      "location": "안방 (침실1)",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "일체형 집진 탈취필터",
+      "repairNotes": "필터 수명 75%",
+      "repairHistory": []
+    },
+    {
+      "id": "st-12",
+      "name": "비스포크 제트 봇 AI 로봇청소기",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "VR50T95935W",
+      "purchaseDate": "2023-01-10",
+      "location": "거실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "먼지봉투 VCA-RDB95 / 사이드브러시",
+      "repairNotes": "청정스테이션 봉투 교체 완료",
+      "repairHistory": []
+    },
+    {
+      "id": "st-13",
+      "name": "비스포크 제트 무선청소기",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "VS20A956A31",
+      "purchaseDate": "2023-02-15",
+      "location": "거실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "물걸레 패드 / 배터리",
+      "repairNotes": "배터리 수명 양호",
+      "repairHistory": []
+    },
+    {
+      "id": "st-14",
+      "name": "스마트TV Neo QLED 85인치",
+      "category": "living",
+      "brand": "삼성전자",
+      "modelNumber": "KQ85QNA90AFXKR",
+      "purchaseDate": "2022-11-20",
+      "location": "거실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "솔라셀 리모컨",
+      "repairNotes": "패널 상태 최상",
+      "repairHistory": []
+    },
+    {
+      "id": "st-15",
+      "name": "스마트 허브 v3",
+      "category": "smart_home",
+      "brand": "SmartThings",
+      "modelNumber": "IM6001-V3P22",
+      "purchaseDate": "2022-01-05",
+      "location": "거실",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "지그비/Z-Wave 안테나",
+      "repairNotes": "온라인 정상 연결 중",
+      "repairHistory": []
+    },
+    {
+      "id": "st-16",
+      "name": "게이트맨 디지털도어록",
+      "category": "smart_home",
+      "brand": "게이트맨 (Gateman)",
+      "modelNumber": "Gateman Digital",
+      "purchaseDate": "2013-09-01",
+      "location": "현관",
+      "status": "good",
+      "asContact": "1544-3232",
+      "partDetails": "AA건전지 4개",
+      "repairNotes": "게이트맨 공식 AS (1544-3232) / 배터리 정상",
+      "repairHistory": []
+    },
+    {
+      "id": "item-1",
+      "name": "주방 빌트인 렌지후드",
+      "category": "kitchen",
+      "brand": "엔텍 (Ntec)",
+      "modelNumber": "Ntec Hood",
+      "purchaseDate": "2013-09-01",
+      "location": "주방 / 식당",
+      "status": "good",
+      "asContact": "1644-8711",
+      "partDetails": "알루미늄 3단 세척 필터 / 모터 댐퍼",
+      "repairNotes": "엔텍 공식 AS (1644-8711). 알루미늄 기름때 필터 과탄산소다 세척 완료",
+      "repairHistory": [
+        {
+          "date": "2026-04-20",
+          "desc": "알루미늄 기름때 필터 온수 침적 세척"
+        }
+      ]
+    },
+    {
+      "id": "item-2",
+      "name": "빌트인 가스오븐레인지",
+      "category": "kitchen",
+      "brand": "삼성전자",
+      "modelNumber": "Samsung Gas Oven",
+      "purchaseDate": "2013-09-01",
+      "location": "주방 / 식당",
+      "status": "good",
+      "asContact": "1588-3366",
+      "partDetails": "점화 배터리 및 오븐 버너",
+      "repairNotes": "삼성전자 가스오븐레인지 (1588-3366)",
+      "repairHistory": []
+    },
+    {
+      "id": "item-3",
+      "name": "월패드 / 욕실폰 (홈네트워크)",
+      "category": "smart_home",
+      "brand": "코콤 (Kocom)",
+      "modelNumber": "Kocom HomeNet",
+      "purchaseDate": "2013-09-01",
+      "location": "거실",
+      "status": "good",
+      "asContact": "1577-0051",
+      "partDetails": "월패드 전원 보드 / 로비폰 연동 모듈",
+      "repairNotes": "코콤 공식 AS (1577-0051). 공동현관 로비폰 및 경비실 통화 정상 연동",
+      "repairHistory": []
+    },
+    {
+      "id": "item-4",
+      "name": "환기유니트 (전열교환기)",
+      "category": "living",
+      "brand": "에어패스 (Airpass)",
+      "modelNumber": "Airpass Unit",
+      "purchaseDate": "2013-09-01",
+      "location": "발코니 / 다용도실",
+      "status": "good",
+      "asContact": "062-382-2002",
+      "partDetails": "프리필터 / 헤파필터 (서브: 062-382-4543)",
+      "repairNotes": "에어패스 공식 AS (062-382-2002 / 062-382-4543). 천장형 환기 필터 정기 점검",
+      "repairHistory": []
+    },
+    {
+      "id": "item-5",
+      "name": "각방 난방 온도조절기",
+      "category": "living",
+      "brand": "코텍 (Kotec)",
+      "modelNumber": "Kotec Controller",
+      "purchaseDate": "2013-09-01",
+      "location": "거실",
+      "status": "good",
+      "asContact": "062-375-7339",
+      "partDetails": "온도센서 및 밸브 구동기",
+      "repairNotes": "코텍 공식 AS (062-375-7339). 각방 난방 정상 제어",
+      "repairHistory": []
+    },
+    {
+      "id": "item-6",
+      "name": "대기전력 / 일괄소등 스위치",
+      "category": "living",
+      "brand": "모든전기",
+      "modelNumber": "Moden Electric SW",
+      "purchaseDate": "2013-09-01",
+      "location": "현관",
+      "status": "good",
+      "asContact": "062-511-2565",
+      "partDetails": "릴레이 스위치 기판",
+      "repairNotes": "모든전기 공식 AS (062-511-2565). 현관 일괄소등 및 대기전력 차단 정상",
+      "repairHistory": []
+    },
+    {
+      "id": "item-7",
+      "name": "주방TV / 싱크대 폰",
+      "category": "kitchen",
+      "brand": "코스텔 (Costel)",
+      "modelNumber": "Costel Kitchen TV",
+      "purchaseDate": "2013-09-01",
+      "location": "주방 / 식당",
+      "status": "good",
+      "asContact": "1577-7737",
+      "partDetails": "LCD 화면 및 라디오 안테나",
+      "repairNotes": "코스텔 공식 AS (1577-7737). 라디오 및 현관 문열림 연동 (절수페달: 은하 1577-4613)",
+      "repairHistory": []
+    }
+  ]
+}

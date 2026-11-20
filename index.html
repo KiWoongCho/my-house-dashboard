@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>하남2지구 중흥S클래스 84A 홈 케어 대시보드</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM UMD -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif; }
+    .room-overlay-card {
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      box-sizing: border-box !important;
+    }
+    .room-overlay-card:hover {
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.7);
+      border-color: #10b981 !important;
+    }
+    .room-selected {
+      border-width: 3px !important;
+      border-color: #10b981 !important;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.9) !important;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  <div id="root"></div>
+
+  <script>
+(function(){
+  var __GEN_AT = "2026-11-20 14:37:18";
+  var __READONLY = {"success": false, "message": "정적 GitHub Pages 모드에서는 저장이 비활성화되어 있습니다."};
+  var __ORIG_FETCH = window.fetch.bind(window);
+  window.fetch = function(input, init) {
+    var rawUrl = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
+    if (rawUrl === '/api/layout') return __ORIG_FETCH('./layout_config.json');
+    if (rawUrl === '/api/save_layout') {
+      return Promise.resolve(new Response(JSON.stringify(__READONLY), {
+        status: 200, headers: {'Content-Type': 'application/json; charset=utf-8'}
+      }));
+    }
+    return __ORIG_FETCH(input, init);
+  };
+  window.addEventListener('DOMContentLoaded', function() {
+    var bar = document.createElement('div');
+    bar.style.cssText = 'background:#0f172a;color:#cbd5e1;font-size:12px;padding:6px 12px;text-align:center;border-bottom:1px solid #334155;';
+    bar.textContent = '🔒 GitHub Pages 읽기 전용 스냅샷 (' + __GEN_AT + ') · 동/호수·관리비·차량·입주민 글 제외됨';
+    document.body.insertBefore(bar, document.body.firstChild);
+  });
+})();
+</script>
+<script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
+
+// 공지사항 18개 하위 카테고리
+const NOTICE_CATEGORIES = [{
+  id: 'all',
+  name: '전체보기'
+}, {
+  id: '관리사무소 공지사항',
+  name: '관리사무소 공지사항'
+}, {
+  id: '입대의 공지사항',
+  name: '입대의 공지사항'
+}, {
+  id: '회의결과',
+  name: '회의결과'
+}, {
+  id: '입찰정보',
+  name: '입찰정보'
+}, {
+  id: '클래시안센터',
+  name: '클래시안센터'
+}, {
+  id: '교육운영위원회',
+  name: '교육운영위원회'
+}, {
+  id: '선관위 공지사항',
+  name: '선관위 공지사항'
+}, {
+  id: '자율방범대',
+  name: '자율방범대'
+}, {
+  id: '계약서',
+  name: '계약서'
+}, {
+  id: '관리비부과명세서',
+  name: '관리비부과명세서'
+}, {
+  id: '장기수선충당금',
+  name: '장기수선충당금'
+}, {
+  id: '관리규약.제규정',
+  name: '관리규약.제규정'
+}, {
+  id: '사업자선정',
+  name: '사업자선정'
+}, {
+  id: '안전관리계획',
+  name: '안전관리계획'
+}, {
+  id: '예비비및잡수입',
+  name: '예비비및잡수입'
+}, {
+  id: '일반공지',
+  name: '일반공지'
+}, {
+  id: '옆집 사장님 가게',
+  name: '옆집 사장님 가게'
+}];
+
+// 입주민 소통공간 9개 하위 카테고리
+const COMMUNITY_CATEGORIES = [{
+  id: 'all',
+  name: '전체보기'
+}, {
+  id: '자유게시판',
+  name: '자유게시판'
+}, {
+  id: '민원접수',
+  name: '민원접수'
+}, {
+  id: '관리사무소 Q&A',
+  name: '관리사무소 Q&A'
+}, {
+  id: '클래시안 민원접수',
+  name: '클래시안 민원접수'
+}, {
+  id: '클래시안 Q&A',
+  name: '클래시안 Q&A'
+}, {
+  id: '이벤트',
+  name: '이벤트'
+}, {
+  id: '중고장터',
+  name: '중고장터'
+}, {
+  id: '***동 게시판',
+  name: '***동 게시판'
+}];
+
+// 집수리 & 인테리어 이웃 실제 검색 키워드 태그
+const REPAIR_QUICK_TAGS = [{
+  name: '전체 소통글',
+  id: 'all',
+  keywords: []
+}, {
+  name: '욕실 환풍기 💨',
+  id: 'fan',
+  keywords: ['환풍', '환풍기', '배기']
+}, {
+  name: '욕조 / 방수 🛁',
+  id: 'bath',
+  keywords: ['욕조', '방수', '타일', '실리콘']
+}, {
+  name: '주방 렌지후드 🍳',
+  id: 'hood',
+  keywords: ['후드', '렌지후드', '주방후드']
+}, {
+  name: '강화마루 바닥 🪵',
+  id: 'floor',
+  keywords: ['마루', '강화마루', '바닥']
+}, {
+  name: '배관 / 누수 💧',
+  id: 'pipe',
+  keywords: ['누수', '배관', '우수관']
+}, {
+  name: '에어컨 세척/점검 ❄️',
+  id: 'ac',
+  keywords: ['에어컨', '실외기', '냉매', '필터']
+}, {
+  name: '월패드 / 인터폰 📱',
+  id: 'wallpad',
+  keywords: ['월패드', '인터폰', '코콤', '홈넷']
+}, {
+  name: '도어락 / 창문 🚪',
+  id: 'door',
+  keywords: ['도어락', '번호키', '창문', '도어']
+}];
+
+// 아파트 사이트 실측 공식 확인 연락처 전체 28개
+const APARTMENT_CONTACTS = [{
+  group: '🏢 단지 관리 & 커뮤니티',
+  items: [{
+    name: '관리사무소 (대표)',
+    tel: '062-956-3788',
+    desc: '단지 관리사무소 대표번호 (평일 09:00 ~ 18:00)',
+    badge: '관리소'
+  }, {
+    name: '관리사무소 공식 팩스 (FAX)',
+    tel: '062-461-3788',
+    desc: '관리사무소 서류/공문 팩스',
+    badge: '팩스'
+  }, {
+    name: '클래시안센터',
+    tel: '062-956-3766',
+    desc: '단지 커뮤니티 / 스포츠센터',
+    badge: '커뮤니티'
+  }, {
+    name: '***동 경비실 / 기전실',
+    tel: '062-956-3788',
+    desc: '관리사무소 대표번호 또는 세대 인터폰 내선 연결',
+    badge: '경비/기전'
+  }]
+}, {
+  group: '🚨 공공 인프라 & 관공서 / 긴급 신고',
+  items: [{
+    name: '해양에너지 (도시가스)',
+    tel: '1544-1115',
+    desc: '광주 도시가스 공급/점검/전입출',
+    badge: '도시가스'
+  }, {
+    name: '한국전력공사 (한전 고장신고)',
+    tel: '123',
+    desc: '정전 및 전기 고장 접수 (국번없이 123)',
+    badge: '한전'
+  }, {
+    name: '광주광역시 광산수도관리소',
+    tel: '062-609-6600',
+    desc: '단수 및 수도 계량기 누수 민원',
+    badge: '상수도'
+  }, {
+    name: '오티스 (승강기 유지보수)',
+    tel: '1661-6112',
+    desc: '단지 엘리베이터 유지보수 및 AS',
+    badge: '승강기'
+  }, {
+    name: '한국승강기안전공단 / 비상출동',
+    tel: '1566-1277',
+    desc: '승강기 안전관리 (갇힘사고 비상출동: 119)',
+    badge: '승강기'
+  }, {
+    name: 'CMB (유선방송/인터넷)',
+    tel: '1544-3434',
+    desc: '단지 케이블 방송 및 인터넷',
+    badge: '방송통신'
+  }, {
+    name: '하남동 주민센터',
+    tel: '062-960-7815',
+    desc: '관할 행정복지센터 전입/등초본/복지업무',
+    badge: '주민센터'
+  }, {
+    name: '하남파출소',
+    tel: '062-951-8113',
+    desc: '관할 파출소 치안 및 긴급 신고',
+    badge: '파출소'
+  }, {
+    name: '월곡소방서',
+    tel: '062-613-8880',
+    desc: '관할 119 안전센터 및 화재/구급 대응',
+    badge: '소방서'
+  }]
+}, {
+  group: '🛠️ 단지 세대 빌트인 설비 & 가전 제조사 지정 AS',
+  items: [{
+    name: '엔텍 (렌지후드)',
+    tel: '1644-8711',
+    desc: '단지 시공 주방 빌트인 렌지후드 AS',
+    badge: '주방후드'
+  }, {
+    name: '삼성전자 (가스오븐/에어컨/가전)',
+    tel: '1588-3366',
+    desc: '빌트인 가스오븐, 시스템에어컨 5대, 비스포크 가전',
+    badge: '삼성공식'
+  }, {
+    name: '코스텔 (주방TV)',
+    tel: '1577-7737',
+    desc: '주방 싱크대 상단 빌트인 주방TV폰',
+    badge: '주방TV'
+  }, {
+    name: '은하 (주방 절수페달)',
+    tel: '1577-4613',
+    desc: '주방 싱크대 하단 절수 발판 페달',
+    badge: '절수페달'
+  }, {
+    name: '코콤 (월패드, 욕실폰)',
+    tel: '1577-0051',
+    desc: '홈네트워크 월패드 및 욕실 스피커폰',
+    badge: '월패드'
+  }, {
+    name: '게이트맨 (디지털도어록)',
+    tel: '1544-3232',
+    desc: '단지 시공 현관 스마트 디지털도어락',
+    badge: '도어락'
+  }, {
+    name: '코텍 (온도조절기)',
+    tel: '062-375-7339',
+    desc: '각방 난방 온도조절기 및 구동기 AS',
+    badge: '온도조절'
+  }, {
+    name: '모든전기 (스위치)',
+    tel: '062-511-2565',
+    desc: '대기전력차단스위치 및 일괄소등 SW',
+    badge: '조명스위치'
+  }, {
+    name: '에어패스 (환기유니트)',
+    tel: '062-382-2002',
+    desc: '실내 천장 전열교환 환기유니트 (서브: 062-382-4543)',
+    badge: '환기유니트'
+  }, {
+    name: '한국소방 (가스차단기)',
+    tel: '062-942-9424',
+    desc: '주방 자동식 소화기 및 가스차단밸브',
+    badge: '소방안전'
+  }, {
+    name: '코콤텍 (빨래건조대)',
+    tel: '02-2093-7700',
+    desc: '발코니 천장 전동 빨래건조대 AS',
+    badge: '건조대'
+  }, {
+    name: '파세코 (비데)',
+    tel: '1588-1336',
+    desc: '욕실 빌트인 전자비데 AS',
+    badge: '비데'
+  }, {
+    name: '하츠 (렌지후드)',
+    tel: '1644-0806',
+    desc: '하츠 본사 서비스센터 (후드 필터/모터)',
+    badge: '주방후드'
+  }, {
+    name: '린나이 (가스레인지)',
+    tel: '1544-3651',
+    desc: '린나이 본사 공식 고객센터 (점화/버너 AS)',
+    badge: '가스레인지'
+  }, {
+    name: '힘펠 (욕실 천장 환풍기)',
+    tel: '1899-0991',
+    desc: '힘펠 본사 공식 고객센터 (환풍기/전동댐퍼)',
+    badge: '환풍기'
+  }]
+}];
+
+// 🌟 실측 84A 확장형 도면 완벽 일치 12개 마스터 구역 🌟
+const MASTER_CALIBRATED_OVERLAY = [{
+  "id": "common_bath",
+  "name": "공동 화장실",
+  "icon": "🚿",
+  "color": "border-cyan-400 text-cyan-200",
+  "matchKeys": ["공동화장실", "공용화장실", "공동"],
+  "xPct": 1.5,
+  "yPct": 37,
+  "wPct": 10.5,
+  "hPct": 24.5,
+  "labelPos": "bottom"
+}, {
+  "id": "entrance",
+  "name": "현관",
+  "icon": "👟",
+  "color": "border-lime-400 text-lime-200",
+  "matchKeys": ["현관", "신발장", "중문"],
+  "xPct": 12.2,
+  "yPct": 21.5,
+  "wPct": 11.5,
+  "hPct": 29,
+  "labelPos": "bottom"
+}, {
+  "id": "room3",
+  "name": "방3 (침실3)",
+  "icon": "🚪",
+  "color": "border-amber-400 text-amber-200",
+  "matchKeys": ["방3", "침실3", "작은방"],
+  "xPct": 24,
+  "yPct": 11,
+  "wPct": 16.5,
+  "hPct": 38,
+  "labelPos": "bottom"
+}, {
+  "id": "kitchen",
+  "name": "주방 / 식당",
+  "icon": "🍳",
+  "color": "border-emerald-400 text-emerald-200",
+  "matchKeys": ["주방", "식당"],
+  "xPct": 44.5,
+  "yPct": 2.5,
+  "wPct": 18.5,
+  "hPct": 49,
+  "labelPos": "bottom"
+}, {
+  "id": "balcony",
+  "name": "발코니 / 다용도실",
+  "icon": "🧺",
+  "color": "border-rose-400 text-rose-200",
+  "matchKeys": ["발코니", "다용도실", "세탁실", "실외기실"],
+  "xPct": 63.5,
+  "yPct": 2.5,
+  "wPct": 20,
+  "hPct": 24,
+  "labelPos": "bottom"
+}, {
+  "id": "master_bath",
+  "name": "안방 욕실",
+  "icon": "🛁",
+  "color": "border-teal-400 text-teal-200",
+  "matchKeys": ["안방화장실", "부부욕실", "안방 욕실", "안방 화장실"],
+  "xPct": 63.5,
+  "yPct": 27.5,
+  "wPct": 9.8,
+  "hPct": 23.5,
+  "labelPos": "bottom"
+}, {
+  "id": "dressroom",
+  "name": "드레스룸",
+  "icon": "👔",
+  "color": "border-purple-400 text-purple-200",
+  "matchKeys": ["드레스룸", "파우더룸"],
+  "xPct": 73.5,
+  "yPct": 27.5,
+  "wPct": 10,
+  "hPct": 23.5,
+  "labelPos": "bottom"
+}, {
+  "id": "room1",
+  "name": "방1 (은찬방)",
+  "icon": "🚪",
+  "color": "border-amber-400 text-amber-200",
+  "matchKeys": ["은찬방", "방1"],
+  "xPct": 12.2,
+  "yPct": 62,
+  "wPct": 14.5,
+  "hPct": 26.5,
+  "labelPos": "bottom"
+}, {
+  "id": "room2",
+  "name": "방2 (은빈방)",
+  "icon": "🚪",
+  "color": "border-yellow-400 text-yellow-200",
+  "matchKeys": ["은빈방", "방2"],
+  "xPct": 27,
+  "yPct": 62,
+  "wPct": 14.5,
+  "hPct": 26.5,
+  "labelPos": "bottom"
+}, {
+  "id": "living",
+  "name": "거실",
+  "icon": "🛋️",
+  "color": "border-blue-400 text-blue-200",
+  "matchKeys": ["거실"],
+  "xPct": 41.8,
+  "yPct": 52.5,
+  "wPct": 21.2,
+  "hPct": 36,
+  "labelPos": "bottom"
+}, {
+  "id": "master_bed",
+  "name": "안방 (침실1)",
+  "icon": "🛏️",
+  "color": "border-indigo-400 text-indigo-200",
+  "matchKeys": ["안방", "침실1", "마스터룸"],
+  "xPct": 63.5,
+  "yPct": 52.5,
+  "wPct": 20,
+  "hPct": 23.5,
+  "labelPos": "bottom"
+}, {
+  "id": "master_balcony",
+  "name": "안방 발코니",
+  "icon": "🌿",
+  "color": "border-emerald-400 text-emerald-200",
+  "matchKeys": ["안방발코니", "베란다", "발코니"],
+  "xPct": 63.5,
+  "yPct": 76.5,
+  "wPct": 20,
+  "hPct": 12,
+  "labelPos": "bottom"
+}];
+const EXACT_INITIAL_ITEMS = [{
+  "id": "st-1",
+  "name": "시스템에어컨 (거실)",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "DVM Home 4Way",
+  "purchaseDate": "2013-09-01",
+  "location": "거실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "시스템 프리필터",
+  "repairNotes": "정기 세척 완료 / 냉매 압력 정상",
+  "repairHistory": [{
+    "date": "2026-05-10",
+    "desc": "초여름 맞이 필터 세척 및 가동 점검"
+  }]
+}, {
+  "id": "st-2",
+  "name": "시스템에어컨 (안방)",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "DVM Home 1Way",
+  "purchaseDate": "2013-09-01",
+  "location": "안방 (침실1)",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "시스템 프리필터",
+  "repairNotes": "정기 세척 완료",
+  "repairHistory": [{
+    "date": "2026-05-10",
+    "desc": "필터 물세척 및 건조"
+  }]
+}, {
+  "id": "st-3",
+  "name": "시스템에어컨 (방1)",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "DVM Home 1Way",
+  "purchaseDate": "2013-09-01",
+  "location": "방1 (은찬방)",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "시스템 프리필터",
+  "repairNotes": "정기 세척 완료",
+  "repairHistory": []
+}, {
+  "id": "st-4",
+  "name": "시스템에어컨 (방2)",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "DVM Home 1Way",
+  "purchaseDate": "2013-09-01",
+  "location": "방2 (은빈방)",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "시스템 프리필터",
+  "repairNotes": "정기 세척 완료",
+  "repairHistory": []
+}, {
+  "id": "st-5",
+  "name": "시스템에어컨 (방3)",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "DVM Home 1Way",
+  "purchaseDate": "2013-09-01",
+  "location": "방3 (침실3)",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "시스템 프리필터",
+  "repairNotes": "정기 세척 완료",
+  "repairHistory": []
+}, {
+  "id": "st-6",
+  "name": "비스포크 4도어 냉장고 (정수기)",
+  "category": "kitchen",
+  "brand": "삼성전자",
+  "modelNumber": "RF85T9111AP",
+  "purchaseDate": "2021-05-15",
+  "location": "주방 / 식당",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "정수 필터 HAF-QIN",
+  "repairNotes": "정수 필터 정기 교체 관리",
+  "repairHistory": [{
+    "date": "2026-03-15",
+    "desc": "정수기 정품 필터 교체"
+  }]
+}, {
+  "id": "st-7",
+  "name": "비스포크 그랑데 AI 세탁기",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "WF24T9500KE",
+  "purchaseDate": "2021-08-20",
+  "location": "발코니 / 다용도실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "배수 필터",
+  "repairNotes": "무세제 통세척 코스 권장",
+  "repairHistory": [{
+    "date": "2026-06-01",
+    "desc": "배수 거름망 이물질 청소"
+  }]
+}, {
+  "id": "st-8",
+  "name": "비스포크 그랑데 AI 건조기",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "DV17T9720SE",
+  "purchaseDate": "2021-08-20",
+  "location": "발코니 / 다용도실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "올인원 필터 / 열교환기",
+  "repairNotes": "열교환기 솔 청소 완료",
+  "repairHistory": []
+}, {
+  "id": "st-9",
+  "name": "비스포크 식기세척기 12인용",
+  "category": "kitchen",
+  "brand": "삼성전자",
+  "modelNumber": "DW60A8375AP",
+  "purchaseDate": "2022-03-10",
+  "location": "주방 / 식당",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "스테인리스 노즐 / 거름망",
+  "repairNotes": "구연산 내부 통살균 세척",
+  "repairHistory": []
+}, {
+  "id": "st-10",
+  "name": "비스포크 큐브 에어 공기청정기 (거실)",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "AX53A9310GED",
+  "purchaseDate": "2022-04-12",
+  "location": "거실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "일체형 집진 탈취필터",
+  "repairNotes": "필터 수명 82%",
+  "repairHistory": []
+}, {
+  "id": "st-11",
+  "name": "비스포크 큐브 에어 공기청정기 (안방)",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "AX53A9310GED",
+  "purchaseDate": "2022-04-12",
+  "location": "안방 (침실1)",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "일체형 집진 탈취필터",
+  "repairNotes": "필터 수명 75%",
+  "repairHistory": []
+}, {
+  "id": "st-12",
+  "name": "비스포크 제트 봇 AI 로봇청소기",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "VR50T95935W",
+  "purchaseDate": "2023-01-10",
+  "location": "거실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "먼지봉투 VCA-RDB95 / 사이드브러시",
+  "repairNotes": "청정스테이션 봉투 교체 완료",
+  "repairHistory": []
+}, {
+  "id": "st-13",
+  "name": "비스포크 제트 무선청소기",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "VS20A956A31",
+  "purchaseDate": "2023-02-15",
+  "location": "거실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "물걸레 패드 / 배터리",
+  "repairNotes": "배터리 수명 양호",
+  "repairHistory": []
+}, {
+  "id": "st-14",
+  "name": "스마트TV Neo QLED 85인치",
+  "category": "living",
+  "brand": "삼성전자",
+  "modelNumber": "KQ85QNA90AFXKR",
+  "purchaseDate": "2022-11-20",
+  "location": "거실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "솔라셀 리모컨",
+  "repairNotes": "패널 상태 최상",
+  "repairHistory": []
+}, {
+  "id": "st-15",
+  "name": "스마트 허브 v3",
+  "category": "smart_home",
+  "brand": "SmartThings",
+  "modelNumber": "IM6001-V3P22",
+  "purchaseDate": "2022-01-05",
+  "location": "거실",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "지그비/Z-Wave 안테나",
+  "repairNotes": "온라인 정상 연결 중",
+  "repairHistory": []
+}, {
+  "id": "st-16",
+  "name": "게이트맨 디지털도어록",
+  "category": "smart_home",
+  "brand": "게이트맨 (Gateman)",
+  "modelNumber": "Gateman Digital",
+  "purchaseDate": "2013-09-01",
+  "location": "현관",
+  "status": "good",
+  "asContact": "1544-3232",
+  "partDetails": "AA건전지 4개",
+  "repairNotes": "게이트맨 공식 AS (1544-3232) / 배터리 정상",
+  "repairHistory": []
+}, {
+  "id": "item-1",
+  "name": "주방 빌트인 렌지후드",
+  "category": "kitchen",
+  "brand": "엔텍 (Ntec)",
+  "modelNumber": "Ntec Hood",
+  "purchaseDate": "2013-09-01",
+  "location": "주방 / 식당",
+  "status": "good",
+  "asContact": "1644-8711",
+  "partDetails": "알루미늄 3단 세척 필터 / 모터 댐퍼",
+  "repairNotes": "엔텍 공식 AS (1644-8711). 알루미늄 기름때 필터 과탄산소다 세척 완료",
+  "repairHistory": [{
+    "date": "2026-04-20",
+    "desc": "알루미늄 기름때 필터 온수 침적 세척"
+  }]
+}, {
+  "id": "item-2",
+  "name": "빌트인 가스오븐레인지",
+  "category": "kitchen",
+  "brand": "삼성전자",
+  "modelNumber": "Samsung Gas Oven",
+  "purchaseDate": "2013-09-01",
+  "location": "주방 / 식당",
+  "status": "good",
+  "asContact": "1588-3366",
+  "partDetails": "점화 배터리 및 오븐 버너",
+  "repairNotes": "삼성전자 가스오븐레인지 (1588-3366)",
+  "repairHistory": []
+}, {
+  "id": "item-3",
+  "name": "월패드 / 욕실폰 (홈네트워크)",
+  "category": "smart_home",
+  "brand": "코콤 (Kocom)",
+  "modelNumber": "Kocom HomeNet",
+  "purchaseDate": "2013-09-01",
+  "location": "거실",
+  "status": "good",
+  "asContact": "1577-0051",
+  "partDetails": "월패드 전원 보드 / 로비폰 연동 모듈",
+  "repairNotes": "코콤 공식 AS (1577-0051). 공동현관 로비폰 및 경비실 통화 정상 연동",
+  "repairHistory": []
+}, {
+  "id": "item-4",
+  "name": "환기유니트 (전열교환기)",
+  "category": "living",
+  "brand": "에어패스 (Airpass)",
+  "modelNumber": "Airpass Unit",
+  "purchaseDate": "2013-09-01",
+  "location": "발코니 / 다용도실",
+  "status": "good",
+  "asContact": "062-382-2002",
+  "partDetails": "프리필터 / 헤파필터 (서브: 062-382-4543)",
+  "repairNotes": "에어패스 공식 AS (062-382-2002 / 062-382-4543). 천장형 환기 필터 정기 점검",
+  "repairHistory": []
+}, {
+  "id": "item-5",
+  "name": "각방 난방 온도조절기",
+  "category": "living",
+  "brand": "코텍 (Kotec)",
+  "modelNumber": "Kotec Controller",
+  "purchaseDate": "2013-09-01",
+  "location": "거실",
+  "status": "good",
+  "asContact": "062-375-7339",
+  "partDetails": "온도센서 및 밸브 구동기",
+  "repairNotes": "코텍 공식 AS (062-375-7339). 각방 난방 정상 제어",
+  "repairHistory": []
+}, {
+  "id": "item-6",
+  "name": "대기전력 / 일괄소등 스위치",
+  "category": "living",
+  "brand": "모든전기",
+  "modelNumber": "Moden Electric SW",
+  "purchaseDate": "2013-09-01",
+  "location": "현관",
+  "status": "good",
+  "asContact": "062-511-2565",
+  "partDetails": "릴레이 스위치 기판",
+  "repairNotes": "모든전기 공식 AS (062-511-2565). 현관 일괄소등 및 대기전력 차단 정상",
+  "repairHistory": []
+}, {
+  "id": "item-7",
+  "name": "주방TV / 싱크대 폰",
+  "category": "kitchen",
+  "brand": "코스텔 (Costel)",
+  "modelNumber": "Costel Kitchen TV",
+  "purchaseDate": "2013-09-01",
+  "location": "주방 / 식당",
+  "status": "good",
+  "asContact": "1577-7737",
+  "partDetails": "LCD 화면 및 라디오 안테나",
+  "repairNotes": "코스텔 공식 AS (1577-7737). 라디오 및 현관 문열림 연동 (절수페달: 은하 1577-4613)",
+  "repairHistory": []
+}];
+const INITIAL_APARTMENT_INFO = {
+  "name": "하남2지구 중흥S클래스",
+  "dong": "***동",
+  "ho": "***호",
+  "unitType": "84A (확장형, 4-Bay 판상형)",
+  "roadAddress": "(공개 저장소 보호를 위해 비공개)",
+  "jibunAddress": "(공개 저장소 보호를 위해 비공개)",
+  "portalUrl": "https://hn2sc.aptner.com/v2"
+};
+const INITIAL_APARTNER_FULL_DATA = {
+  "lastSynced": "2026-11-20 14:37:18",
+  "apartmentName": "광산구 하남2지구 중흥S클래스",
+  "portalUrl": "https://hn2sc.aptner.com/v2",
+  "dong": "***동",
+  "ho": "***호",
+  "unitType": "84A (확장형)",
+  "status": "masked",
+  "liveScraped": false,
+  "totalNoticesCount": 0,
+  "totalCommunityCount": 0,
+  "currentMonth": "비공개 (정적 모드)",
+  "totalAmount": 0,
+  "dueDate": "-",
+  "paymentStatus": "공개 저장소 보호를 위해 개인 주거/관리비/차량/입주민 정보는 제외되었습니다.",
+  "previousMonthAmount": 0,
+  "diffAmount": 0,
+  "julyEstimated": {
+    "status": "비공개",
+    "estimatedAmount": 0,
+    "expectedPublishDate": "-",
+    "calcBasis": "공개 저장소 보호를 위해 개인 주거/관리비/차량/입주민 정보는 제외되었습니다."
+  },
+  "energyUsage": [],
+  "details": [],
+  "history12Months": [],
+  "notices": [],
+  "communityPosts": [],
+  "vehicles": [],
+  "votes": [],
+  "pushNotifications": []
+};
+const MASTER_LAYOUT_STORAGE_KEY = 'hanam2_master_layout_config_v4';
+const MASTER_ITEMS_STORAGE_KEY = 'hanam2_master_items_config_v4';
+function DashboardApp() {
+  // 1. 기기 목록 상태 (동적 추가/삭제 완벽 지원)
+  const [items, setItems] = useState(() => {
+    let saved = localStorage.getItem(MASTER_ITEMS_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return EXACT_INITIAL_ITEMS;
+  });
+
+  // 2. 완벽 실측 정렬 반응형 백분율 레이아웃 상태
+  const [overlayLayout, setOverlayLayout] = useState(() => {
+    const saved = localStorage.getItem(MASTER_LAYOUT_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 10) {
+          return parsed;
+        }
+      } catch (e) {}
+    }
+    return MASTER_CALIBRATED_OVERLAY;
+  });
+
+  // 3. 아파트너 데이터 상태
+  const [apartnerFee, setApartnerFee] = useState(INITIAL_APARTNER_FULL_DATA);
+
+  // 🌟 서버 마스터 영구 동기화 (/api/layout) 초기 로드 🌟
+  useEffect(() => {
+    fetch('/api/layout').then(res => res.json()).then(data => {
+      if (data && data.overlayLayout && Array.isArray(data.overlayLayout) && data.overlayLayout.length > 0) {
+        setOverlayLayout(data.overlayLayout);
+        localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(data.overlayLayout));
+      }
+      if (data && data.items && Array.isArray(data.items) && data.items.length > 0) {
+        setItems(data.items);
+        localStorage.setItem(MASTER_ITEMS_STORAGE_KEY, JSON.stringify(data.items));
+      }
+    }).catch(err => {});
+  }, []);
+  const [bgOpacity, setBgOpacity] = useState(30);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [activeTab, setActiveTab] = useState('floorplan');
+  const [deviceRoomFilter, setDeviceRoomFilter] = useState('all');
+  const [deviceStatusFilter, setDeviceStatusFilter] = useState('all');
+
+  // 🌟 [Alt키 미세조정 & 위치/크기 편집 모드] 상태 🌟
+  const [isEditLayoutMode, setIsEditLayoutMode] = useState(false);
+  const [selectedZoneId, setSelectedZoneId] = useState('living');
+  const [renameZoneId, setRenameZoneId] = useState(null);
+  const [renameValue, setRenameValue] = useState('');
+
+  // 🌟 [공간 구역 추가 모달] 상태 🌟
+  const [isAddZoneModalOpen, setIsAddZoneModalOpen] = useState(false);
+  const [newZoneForm, setNewZoneForm] = useState({
+    name: '',
+    icon: '🚪',
+    color: 'border-emerald-400 text-emerald-200'
+  });
+
+  // 🌟 Alt 키 + 방향키 미세조정 단축키 이벤트 리스너 🌟
+  useEffect(() => {
+    const handleKeyDown = e => {
+      if (!isEditLayoutMode || !selectedZoneId) return;
+      const delta = e.altKey ? 0.2 : 0.5;
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (e.shiftKey) handleAdjustBox(selectedZoneId, 'hPct', -delta);else handleAdjustBox(selectedZoneId, 'yPct', -delta);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (e.shiftKey) handleAdjustBox(selectedZoneId, 'hPct', delta);else handleAdjustBox(selectedZoneId, 'yPct', delta);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (e.shiftKey) handleAdjustBox(selectedZoneId, 'wPct', -delta);else handleAdjustBox(selectedZoneId, 'xPct', -delta);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (e.shiftKey) handleAdjustBox(selectedZoneId, 'wPct', delta);else handleAdjustBox(selectedZoneId, 'xPct', delta);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isEditLayoutMode, selectedZoneId, overlayLayout]);
+
+  // 팝업 모달 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditFeeModalOpen, setIsEditFeeModalOpen] = useState(false);
+  const [showContactsModal, setShowContactsModal] = useState(false);
+
+  // 공지 & 소통 전용 상태
+  const [showFullNoticesModal, setShowFullNoticesModal] = useState(false);
+  const [showFullCommunityModal, setShowFullCommunityModal] = useState(false);
+  const [noticeFilterCategory, setNoticeFilterCategory] = useState('all');
+  const [communityFilterCategory, setCommunityFilterCategory] = useState('all');
+  const [selectedRepairTag, setSelectedRepairTag] = useState('all');
+  const [noticeSearch, setNoticeSearch] = useState('');
+  const [communitySearch, setCommunitySearch] = useState('');
+  const [selectedNotice, setSelectedNotice] = useState(null);
+  const [selectedCommunityPost, setSelectedCommunityPost] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
+  const [moveModalItem, setMoveModalItem] = useState(null);
+  const [feeEditForm, setFeeEditForm] = useState({
+    totalAmount: INITIAL_APARTNER_FULL_DATA.totalAmount || 0,
+    month: INITIAL_APARTNER_FULL_DATA.currentMonth || "2026년 06월분"
+  });
+  const [formData, setFormData] = useState({
+    id: '',
+    name: '',
+    category: 'kitchen',
+    brand: '',
+    modelNumber: '',
+    purchaseDate: '',
+    location: '',
+    status: 'good',
+    warrantyExpires: '',
+    asContact: '',
+    asWebsite: '',
+    partPurchaseUrl: '',
+    partDetails: '',
+    repairNotes: ''
+  });
+
+  // 🌟 [서버 영구 저장 유틸리티] 🌟
+  const saveLayoutAndItemsToServer = (updatedLayout, updatedItems, successMsg) => {
+    const payload = {
+      savedAt: new Date().toISOString(),
+      version: '4.0-perfect-architectural-alignment',
+      overlayLayout: updatedLayout,
+      items: updatedItems
+    };
+    fetch('/api/save_layout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }).then(res => res.json()).then(resData => {
+      if (successMsg) alert(successMsg);
+    }).catch(err => {
+      if (successMsg) alert('💾 [브라우저 저장 완료]');
+    });
+  };
+
+  // 🌟 [배치위치 저장] 브라우저 로컬 + 서버 영구 파일(layout_config.json) 동시 저장 🌟
+  const handleUserPermanentSave = () => {
+    localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(overlayLayout));
+    localStorage.setItem(MASTER_ITEMS_STORAGE_KEY, JSON.stringify(items));
+    setIsEditLayoutMode(false);
+    saveLayoutAndItemsToServer(overlayLayout, items, '💾 [배치위치 저장 및 모바일 완벽 동기화 완료]\n\n실측 도면과 100% 일치하도록 보정된 좌표가 서버(layout_config.json)에 영구 저장되었습니다!');
+  };
+
+  // 🌟 [위치 불러오기] 서버 또는 로컬 저장소로부터 복원 🌟
+  const handleUserPermanentLoad = () => {
+    fetch('/api/layout').then(res => res.json()).then(data => {
+      if (data && Array.isArray(data.overlayLayout) && data.overlayLayout.length > 0) {
+        setOverlayLayout(data.overlayLayout);
+        localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(data.overlayLayout));
+        if (data.items && Array.isArray(data.items)) {
+          setItems(data.items);
+          localStorage.setItem(MASTER_ITEMS_STORAGE_KEY, JSON.stringify(data.items));
+        }
+        alert('📂 [서버 실측 마스터 배치 불러오기 완료]\n\n도면과 완벽히 일치하는 최신 좌표로 복원되었습니다!');
+        return;
+      }
+      throw new Error('No server layout');
+    }).catch(() => {
+      setOverlayLayout(MASTER_CALIBRATED_OVERLAY);
+      alert('📂 [실측 표준 배치로 복원되었습니다]');
+    });
+  };
+
+  // 🌟 기본 배치로 초기화 리셋 🌟
+  const handleResetDefaultLayout = () => {
+    if (confirm('도면 배치를 실측 100% 일치 표준 좌표로 초기화하시겠습니까?')) {
+      setOverlayLayout(MASTER_CALIBRATED_OVERLAY);
+      localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(MASTER_CALIBRATED_OVERLAY));
+      setSelectedZoneId('living');
+    }
+  };
+
+  // 🌟 [새 공간 구역 카드 추가] 핸들러 🌟
+  const handleAddNewZone = e => {
+    e.preventDefault();
+    if (!newZoneForm.name.trim()) return;
+    const newId = 'zone_' + Date.now();
+    const newZone = {
+      id: newId,
+      name: newZoneForm.name.trim(),
+      icon: newZoneForm.icon || '🚪',
+      color: newZoneForm.color || 'border-emerald-400 text-emerald-200',
+      matchKeys: [newZoneForm.name.trim()],
+      xPct: 42.0,
+      yPct: 42.0,
+      wPct: 15.0,
+      hPct: 18.0,
+      labelPos: 'bottom'
+    };
+    const updated = [...overlayLayout, newZone];
+    setOverlayLayout(updated);
+    localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(updated));
+    saveLayoutAndItemsToServer(updated, items, null);
+    setSelectedZoneId(newId);
+    setIsAddZoneModalOpen(false);
+    setNewZoneForm({
+      name: '',
+      icon: '🚪',
+      color: 'border-emerald-400 text-emerald-200'
+    });
+    setIsEditLayoutMode(true);
+    alert(`✨ '${newZone.name}' 공간 카드가 평면도 중앙에 추가되었습니다!\n\nAlt+방향키로 위치 조절 후 [💾 배치 저장]을 눌러주세요.`);
+  };
+
+  // 🌟 [선택된 공간 구역 카드 삭제] 핸들러 🌟
+  const handleDeleteZone = zoneId => {
+    const target = overlayLayout.find(z => z.id === zoneId);
+    if (!target) return;
+    const assignedItems = getItemsByRoomName(target.name);
+    let confirmMsg = `정말로 '${target.name}' 공간 카드를 평면도에서 삭제하시겠습니까?`;
+    if (assignedItems.length > 0) {
+      confirmMsg += `\n\n⚠️ 현재 이 공간에 ${assignedItems.length}개의 기기/수리 카드가 배치되어 있습니다.`;
+    }
+    if (confirm(confirmMsg)) {
+      const updated = overlayLayout.filter(z => z.id !== zoneId);
+      setOverlayLayout(updated);
+      localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(updated));
+      saveLayoutAndItemsToServer(updated, items, null);
+      setSelectedZoneId(updated.length > 0 ? updated[0].id : null);
+      if (selectedRoom === target.name) setSelectedRoom(null);
+    }
+  };
+
+  // 🌟 위치/크기 정교 조절 🌟
+  const handleAdjustBox = (id, field, delta) => {
+    setOverlayLayout(prev => prev.map(z => {
+      if (z.id === id) {
+        const currentVal = z[field] !== undefined ? z[field] : 0;
+        const newVal = Math.max(0.2, Math.min(99.8, parseFloat((currentVal + delta).toFixed(2))));
+        return {
+          ...z,
+          [field]: newVal
+        };
+      }
+      return z;
+    }));
+  };
+  const handleRenameSubmit = id => {
+    if (!renameValue.trim()) return setRenameZoneId(null);
+    const updated = overlayLayout.map(z => z.id === id ? {
+      ...z,
+      name: renameValue.trim(),
+      matchKeys: [renameValue.trim()]
+    } : z);
+    setOverlayLayout(updated);
+    localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(updated));
+    saveLayoutAndItemsToServer(updated, items, null);
+    setRenameZoneId(null);
+  };
+  const handleLabelPosChange = (id, pos) => {
+    const updated = overlayLayout.map(z => z.id === id ? {
+      ...z,
+      labelPos: pos
+    } : z);
+    setOverlayLayout(updated);
+    localStorage.setItem(MASTER_LAYOUT_STORAGE_KEY, JSON.stringify(updated));
+    saveLayoutAndItemsToServer(updated, items, null);
+  };
+  const moveItemToRoom = (itemId, targetRoomName) => {
+    const updated = items.map(item => {
+      if (item.id === itemId) {
+        return {
+          ...item,
+          location: targetRoomName
+        };
+      }
+      return item;
+    });
+    setItems(updated);
+    localStorage.setItem(MASTER_ITEMS_STORAGE_KEY, JSON.stringify(updated));
+    saveLayoutAndItemsToServer(overlayLayout, updated, null);
+    setMoveModalItem(null);
+  };
+  const getItemsByRoomName = roomName => {
+    const targetZone = overlayLayout.find(z => z.name === roomName);
+    const matchKeys = targetZone ? targetZone.matchKeys : [roomName];
+    return items.filter(item => {
+      if (item.location === roomName) return true;
+      if (targetZone && matchKeys.some(k => item.location && item.location.includes(k))) return true;
+      return false;
+    });
+  };
+
+  // 공지사항 필터링
+  const filteredNotices = (apartnerFee.notices || []).filter(notice => {
+    if (noticeFilterCategory !== 'all') {
+      if (notice.category !== noticeFilterCategory) return false;
+    }
+    if (noticeSearch.trim()) {
+      const q = noticeSearch.toLowerCase();
+      const matchTitle = (notice.title || '').toLowerCase().includes(q);
+      const matchContent = (notice.content || '').toLowerCase().includes(q);
+      const matchAuthor = (notice.author || '').toLowerCase().includes(q);
+      if (!matchTitle && !matchContent && !matchAuthor) return false;
+    }
+    return true;
+  });
+
+  // 입주민 소통공간 필터링
+  const filteredCommunityPosts = (apartnerFee.communityPosts || []).filter(post => {
+    if (communityFilterCategory !== 'all') {
+      if (post.category !== communityFilterCategory) return false;
+    }
+    if (selectedRepairTag !== 'all') {
+      const tagObj = REPAIR_QUICK_TAGS.find(t => t.id === selectedRepairTag);
+      if (tagObj && tagObj.keywords && tagObj.keywords.length > 0) {
+        const combinedText = ((post.title || '') + ' ' + (post.content || '')).toLowerCase();
+        const matchesRepair = tagObj.keywords.some(k => combinedText.includes(k.toLowerCase()));
+        if (!matchesRepair) return false;
+      }
+    }
+    if (communitySearch.trim()) {
+      const q = communitySearch.toLowerCase();
+      const matchTitle = (post.title || '').toLowerCase().includes(q);
+      const matchAuthor = (post.author || '').toLowerCase().includes(q);
+      const matchContent = (post.content || '').toLowerCase().includes(q);
+      if (!matchTitle && !matchAuthor && !matchContent) return false;
+    }
+    return true;
+  });
+
+  // 기기 및 집수리 카드 필터링
+  const filteredDevices = items.filter(item => {
+    if (deviceRoomFilter !== 'all' && item.location !== deviceRoomFilter) return false;
+    if (deviceStatusFilter === 'warning' && item.status !== 'warning') return false;
+    if (deviceStatusFilter === 'good' && item.status !== 'good') return false;
+    return true;
+  });
+  const handleSaveFeeEdit = e => {
+    e.preventDefault();
+    const updated = {
+      ...apartnerFee,
+      totalAmount: parseInt(feeEditForm.totalAmount) || 0,
+      currentMonth: feeEditForm.month
+    };
+    setApartnerFee(updated);
+    setIsEditFeeModalOpen(false);
+  };
+
+  // 🌟 [기기 추가 모달 열기] 🌟
+  const handleOpenAddModal = (presetLocation = null) => {
+    setEditingItem(null);
+    setFormData({
+      id: 'item-' + Date.now(),
+      name: '',
+      category: 'kitchen',
+      brand: '',
+      modelNumber: '',
+      purchaseDate: new Date().toISOString().split('T')[0],
+      location: presetLocation || selectedRoom || (overlayLayout[0] ? overlayLayout[0].name : '거실'),
+      status: 'good',
+      warrantyExpires: '',
+      asContact: '',
+      asWebsite: '',
+      partPurchaseUrl: '',
+      partDetails: '',
+      repairNotes: ''
+    });
+    setIsModalOpen(true);
+  };
+
+  // 🌟 [기기 수정 모달 열기] 🌟
+  const handleOpenEditModal = (item, e) => {
+    if (e) e.stopPropagation();
+    setEditingItem(item);
+    setFormData({
+      ...item
+    });
+    setIsModalOpen(true);
+  };
+
+  // 🌟 [기기 삭제 처리 및 서버 실시간 영구 반영] 🌟
+  const handleDeleteItem = (id, e) => {
+    if (e) e.stopPropagation();
+    const target = items.find(it => it.id === id);
+    const name = target ? target.name : '해당 기기';
+    if (confirm(`정말로 '${name}' 기기를 삭제하시겠습니까?`)) {
+      const updated = items.filter(item => item.id !== id);
+      setItems(updated);
+      localStorage.setItem(MASTER_ITEMS_STORAGE_KEY, JSON.stringify(updated));
+      saveLayoutAndItemsToServer(overlayLayout, updated, `🗑️ '${name}' 기기가 삭제되어 서버 및 모바일에 실시간 반영되었습니다.`);
+    }
+  };
+
+  // 🌟 [기기 저장 처리 및 서버 실시간 영구 반영] 🌟
+  const handleSaveItem = e => {
+    e.preventDefault();
+    let updated;
+    const isEdit = !!editingItem;
+    if (isEdit) {
+      updated = items.map(it => it.id === editingItem.id ? {
+        ...formData
+      } : it);
+    } else {
+      updated = [...items, {
+        ...formData,
+        id: 'item-' + Date.now(),
+        repairHistory: []
+      }];
+    }
+    setItems(updated);
+    localStorage.setItem(MASTER_ITEMS_STORAGE_KEY, JSON.stringify(updated));
+    saveLayoutAndItemsToServer(overlayLayout, updated, isEdit ? `💾 '${formData.name}' 기기 정보가 수정 저장되었습니다.` : `➕ '${formData.name}' 기기가 새로 등록되어 서버 및 모바일에 실시간 저장되었습니다!`);
+    setIsModalOpen(false);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "max-w-7xl mx-auto p-2 sm:p-6 space-y-4"
+  }, /*#__PURE__*/React.createElement("header", {
+    className: "bg-slate-900 text-white rounded-2xl p-4 sm:p-6 shadow-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-2xl sm:text-3xl"
+  }, "🏡"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    className: "text-lg sm:text-2xl font-black tracking-tight flex items-center gap-2"
+  }, "하남2지구 중흥S클래스", /*#__PURE__*/React.createElement("span", {
+    className: "text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold"
+  }, "***동 ***호 (84A 확장형)")), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] sm:text-xs text-slate-400 mt-0.5"
+  }, "기기 총 ", items.length, "대 실시간 등록·관리 · SmartThings 연동 · 아파트너 실시간 동기화")))), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-wrap items-center gap-2 text-xs w-full md:w-auto justify-between md:justify-end"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => handleOpenAddModal(),
+    className: "px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-md transition flex items-center gap-1 text-[11px] sm:text-xs"
+  }, /*#__PURE__*/React.createElement("span", null, "➕"), " 새 기기 등록"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowContactsModal(true),
+    className: "px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl shadow-md transition flex items-center gap-1 text-[11px] sm:text-xs border border-slate-700"
+  }, /*#__PURE__*/React.createElement("span", null, "📞"), " 아파트 연락처 (", APARTMENT_CONTACTS.reduce((acc, g) => acc + g.items.length, 0), "개)"), /*#__PURE__*/React.createElement("a", {
+    href: "https://hn2sc.aptner.com/v2",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    className: "px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-md transition text-[11px] sm:text-xs"
+  }, "🌐 아파트너 ↗"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex border-b border-gray-200 gap-1 sm:gap-2 overflow-x-auto no-scrollbar"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setActiveTab('floorplan'),
+    className: `px-3.5 sm:px-5 py-2.5 sm:py-3 font-bold text-xs sm:text-sm border-b-2 transition flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'floorplan' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/50 rounded-t-xl font-black' : 'border-transparent text-gray-500 hover:text-gray-900'}`
+  }, /*#__PURE__*/React.createElement("span", null, "📐"), " 84A 실측 평면도", /*#__PURE__*/React.createElement("span", {
+    className: "px-1.5 py-0.5 text-[9px] bg-indigo-600 text-white rounded-full font-bold"
+  }, overlayLayout.length, "개")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setActiveTab('devices'),
+    className: `px-3.5 sm:px-5 py-2.5 sm:py-3 font-bold text-xs sm:text-sm border-b-2 transition flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'devices' ? 'border-amber-600 text-amber-600 bg-amber-50/50 rounded-t-xl font-black' : 'border-transparent text-gray-500 hover:text-gray-900'}`
+  }, /*#__PURE__*/React.createElement("span", null, "🛠️"), " 기기·수리 이력", /*#__PURE__*/React.createElement("span", {
+    className: "px-1.5 py-0.5 text-[9px] bg-amber-600 text-white rounded-full font-bold"
+  }, items.length, "대")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setActiveTab('community'),
+    className: `px-3.5 sm:px-5 py-2.5 sm:py-3 font-bold text-xs sm:text-sm border-b-2 transition flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'community' ? 'border-[#8B111A] text-[#8B111A] bg-red-50/50 rounded-t-xl font-black' : 'border-transparent text-gray-500 hover:text-gray-900'}`
+  }, /*#__PURE__*/React.createElement("span", null, "🏢"), " 공지 & 이웃 수리"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setActiveTab('fees'),
+    className: `px-3.5 sm:px-5 py-2.5 sm:py-3 font-bold text-xs sm:text-sm border-b-2 transition flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'fees' ? 'border-emerald-600 text-emerald-600 bg-emerald-50/50 rounded-t-xl font-black' : 'border-transparent text-gray-500 hover:text-gray-900'}`
+  }, /*#__PURE__*/React.createElement("span", null, "💳"), " 관리비")), activeTab === 'floorplan' && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-slate-900 rounded-2xl p-3 sm:p-5 shadow-xl text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    className: "text-sm sm:text-base font-bold text-emerald-400 flex items-center gap-1.5"
+  }, "***동 ***호 84A 실물 도면 완벽 정렬"), /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] sm:text-xs text-slate-300 mt-0.5"
+  }, "방을 터치하면 해당 구역에 배치된 기기와 AS 연락처를 확인 및 추가/삭제할 수 있습니다.")), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 text-[11px]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-slate-300 font-bold"
+  }, "투명도:"), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "0",
+    max: "70",
+    value: bgOpacity,
+    onChange: e => setBgOpacity(Number(e.target.value)),
+    className: "w-16 sm:w-20 accent-emerald-500 cursor-pointer"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-emerald-400 font-mono w-6 text-[10px]"
+  }, bgOpacity, "%")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => handleOpenAddModal(selectedRoom),
+    className: "px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("span", null, "➕"), " 기기 등록"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setIsAddZoneModalOpen(true),
+    className: "px-2.5 py-1.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("span", null, "➕"), " 구역 추가"), !isEditLayoutMode ? /*#__PURE__*/React.createElement("button", {
+    onClick: () => setIsEditLayoutMode(true),
+    className: "px-2.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("span", null, "✏️ 편집")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    onClick: handleUserPermanentSave,
+    className: "px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-xl transition shadow-md flex items-center gap-1 animate-pulse"
+  }, /*#__PURE__*/React.createElement("span", null, "💾 저장")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setIsEditLayoutMode(false),
+    className: "px-2.5 py-1.5 bg-slate-700 text-white text-xs rounded-xl"
+  }, "취소"), /*#__PURE__*/React.createElement("button", {
+    onClick: handleResetDefaultLayout,
+    className: "px-2 py-1.5 bg-rose-700 text-white text-xs rounded-xl"
+  }, "🔄 초기화")), /*#__PURE__*/React.createElement("button", {
+    onClick: handleUserPermanentLoad,
+    className: "px-2.5 py-1.5 bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("span", null, "📂"), " 불러오기"))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-slate-950 rounded-2xl p-1.5 sm:p-4 border border-slate-800 shadow-2xl overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative w-full max-w-[960px] mx-auto rounded-xl border border-slate-700 shadow-inner select-none overflow-hidden",
+    style: {
+      aspectRatio: '903 / 676',
+      backgroundImage: "url('./floorplan_84a.png')",
+      backgroundSize: '100% 100%',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }
+  }, overlayLayout.map(zone => {
+    const isSelected = selectedRoom === zone.name;
+    const isEditingThis = selectedZoneId === zone.id;
+    const roomItems = getItemsByRoomName(zone.name);
+    const labelPosition = zone.labelPos || 'bottom';
+    return /*#__PURE__*/React.createElement("div", {
+      key: zone.id,
+      style: {
+        left: `${zone.xPct}%`,
+        top: `${zone.yPct}%`,
+        width: `${zone.wPct}%`,
+        height: `${zone.hPct}%`,
+        backgroundColor: `rgba(15, 23, 42, ${bgOpacity / 100})`,
+        boxSizing: 'border-box'
+      },
+      onClick: () => {
+        if (isEditLayoutMode) {
+          setSelectedZoneId(zone.id);
+        }
+        setSelectedRoom(isSelected ? null : zone.name);
+      },
+      className: `absolute rounded-lg sm:rounded-xl border-2 p-0.5 sm:p-1.5 flex flex-col justify-between room-overlay-card cursor-pointer shadow-md overflow-hidden ${zone.color} ${isSelected ? 'room-selected' : ''} ${isEditLayoutMode ? 'border-dashed' : ''} ${isEditingThis && isEditLayoutMode ? 'ring-3 ring-amber-400 border-amber-300 z-30 bg-black/85' : ''}`
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex justify-between items-start pointer-events-none w-full"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-[9px] sm:text-xs bg-black/80 px-1 py-0.5 rounded text-white font-bold leading-none"
+    }, zone.icon), /*#__PURE__*/React.createElement("span", {
+      className: "px-1 py-0.5 bg-emerald-600 text-white rounded text-[7px] sm:text-[9px] font-bold shadow-xs leading-none"
+    }, roomItems.length, "대")), labelPosition !== 'hidden' && /*#__PURE__*/React.createElement("div", {
+      className: `text-center py-0.5 pointer-events-none w-full flex justify-center ${labelPosition === 'top' ? 'order-first mb-0.5' : labelPosition === 'center' ? 'my-auto' : 'mt-auto'}`
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-[7.5px] sm:text-xs font-bold text-white bg-black/85 border border-white/20 py-0.5 px-1 sm:px-2 rounded-full inline-block truncate max-w-full shadow-xs leading-tight"
+    }, zone.name)), isEditLayoutMode && isEditingThis && /*#__PURE__*/React.createElement("div", {
+      className: "mt-0.5 pt-0.5 border-t border-amber-500/50 flex flex-col gap-0.5 text-[8px] bg-black/90 p-0.5 rounded z-30 shadow-lg",
+      onClick: e => e.stopPropagation()
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex justify-between items-center text-amber-300 font-bold"
+    }, /*#__PURE__*/React.createElement("span", null, "위치:"), /*#__PURE__*/React.createElement("div", {
+      className: "flex gap-0.5"
+    }, /*#__PURE__*/React.createElement("button", {
+      title: "위로",
+      onClick: () => handleAdjustBox(zone.id, 'yPct', -0.5),
+      className: "px-1 py-0.2 bg-amber-700 text-white rounded"
+    }, "▲"), /*#__PURE__*/React.createElement("button", {
+      title: "아래로",
+      onClick: () => handleAdjustBox(zone.id, 'yPct', 0.5),
+      className: "px-1 py-0.2 bg-amber-700 text-white rounded"
+    }, "▼"), /*#__PURE__*/React.createElement("button", {
+      title: "왼쪽",
+      onClick: () => handleAdjustBox(zone.id, 'xPct', -0.5),
+      className: "px-1 py-0.2 bg-amber-700 text-white rounded"
+    }, "◀"), /*#__PURE__*/React.createElement("button", {
+      title: "오른쪽",
+      onClick: () => handleAdjustBox(zone.id, 'xPct', 0.5),
+      className: "px-1 py-0.2 bg-amber-700 text-white rounded"
+    }, "▶")))));
+  }))), isEditLayoutMode && selectedZoneId && (() => {
+    const zone = overlayLayout.find(z => z.id === selectedZoneId);
+    if (!zone) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "bg-slate-900 text-white rounded-2xl p-3 sm:p-4 border-2 border-amber-500/80 shadow-2xl flex flex-wrap items-center justify-between gap-3"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-2"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-xl sm:text-2xl"
+    }, zone.icon), /*#__PURE__*/React.createElement("div", null, renameZoneId === zone.id ? /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-1"
+    }, /*#__PURE__*/React.createElement("input", {
+      type: "text",
+      value: renameValue,
+      onChange: e => setRenameValue(e.target.value),
+      className: "px-2 py-1 bg-slate-800 border border-amber-400 rounded text-xs text-white font-bold",
+      placeholder: "방 이름",
+      autoFocus: true
+    }), /*#__PURE__*/React.createElement("button", {
+      onClick: () => handleRenameSubmit(zone.id),
+      className: "px-2 py-1 bg-emerald-600 text-white text-xs font-bold rounded"
+    }, "저장"), /*#__PURE__*/React.createElement("button", {
+      onClick: () => setRenameZoneId(null),
+      className: "px-2 py-1 bg-slate-700 text-white text-xs rounded"
+    }, "취소")) : /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-2"
+    }, /*#__PURE__*/React.createElement("h3", {
+      className: "font-bold text-sm sm:text-base text-amber-300"
+    }, "[", zone.name, "] 조절 중"), /*#__PURE__*/React.createElement("button", {
+      onClick: () => {
+        setRenameZoneId(zone.id);
+        setRenameValue(zone.name);
+      },
+      className: "px-2 py-0.5 bg-slate-800 text-slate-300 text-[10px] font-bold rounded border border-slate-600"
+    }, "✏️ 이름변경")), /*#__PURE__*/React.createElement("p", {
+      className: "text-[10px] text-slate-400"
+    }, "X:", zone.xPct, "% Y:", zone.yPct, "% W:", zone.wPct, "% H:", zone.hPct, "%"))), /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-1.5 bg-slate-800 p-1.5 rounded-xl border border-slate-700 text-[11px]"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-slate-300 font-bold"
+    }, "라벨:"), ['top', 'center', 'bottom', 'hidden'].map(pos => /*#__PURE__*/React.createElement("button", {
+      key: pos,
+      onClick: () => handleLabelPosChange(zone.id, pos),
+      className: `px-2 py-0.5 rounded font-bold transition ${(zone.labelPos || 'bottom') === pos ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`
+    }, pos === 'top' ? '위' : pos === 'center' ? '중' : pos === 'bottom' ? '아래' : '숨김'))), /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-2"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => handleDeleteZone(zone.id),
+      className: "px-2.5 py-1.5 bg-red-800/80 text-red-100 text-xs font-bold rounded-xl transition"
+    }, "🗑️ 삭제"), /*#__PURE__*/React.createElement("button", {
+      onClick: handleUserPermanentSave,
+      className: "px-3.5 py-1.5 bg-emerald-600 text-white text-xs font-black rounded-xl shadow-md"
+    }, "💾 배치 저장")));
+  })(), selectedRoom && /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-xs space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center border-b pb-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm sm:text-base font-bold text-gray-900"
+  }, "📍 [", selectedRoom, "] 배치 기기 및 설비 (", getItemsByRoomName(selectedRoom).length, "대)"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => handleOpenAddModal(selectedRoom),
+    className: "px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow-2xs flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("span", null, "➕"), " 이 방에 기기 등록")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setSelectedRoom(null),
+    className: "text-xs px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold"
+  }, "선택 해제")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-3 gap-3"
+  }, getItemsByRoomName(selectedRoom).map(item => /*#__PURE__*/React.createElement("div", {
+    key: item.id,
+    className: "p-3.5 rounded-xl border border-gray-200 bg-gray-50/70 space-y-2 flex flex-col justify-between"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-start"
+  }, /*#__PURE__*/React.createElement("h4", {
+    className: "text-xs font-bold text-gray-900"
+  }, item.name), /*#__PURE__*/React.createElement("span", {
+    className: `px-2 py-0.5 rounded text-[9px] font-bold ${item.status === 'good' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`
+  }, item.status === 'good' ? '정상 가동' : '점검 필요')), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-gray-600 space-y-1"
+  }, /*#__PURE__*/React.createElement("div", null, "제조사: ", /*#__PURE__*/React.createElement("strong", null, item.brand), " (모델: ", /*#__PURE__*/React.createElement("span", {
+    className: "font-mono"
+  }, item.modelNumber), ")"), /*#__PURE__*/React.createElement("div", null, "AS: ", /*#__PURE__*/React.createElement("a", {
+    href: `tel:${item.asContact}`,
+    className: "text-indigo-600 font-bold underline"
+  }, "📞 ", item.asContact)), item.partDetails && /*#__PURE__*/React.createElement("div", null, "부품/소모품: ", /*#__PURE__*/React.createElement("span", {
+    className: "text-amber-800"
+  }, item.partDetails)), item.repairNotes && /*#__PURE__*/React.createElement("div", {
+    className: "text-gray-500"
+  }, "메모: ", item.repairNotes))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1.5 pt-2 border-t text-xs"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setMoveModalItem(item),
+    className: "flex-1 py-1 bg-indigo-50 text-indigo-700 rounded font-bold"
+  }, "방 이동 ↔"), /*#__PURE__*/React.createElement("button", {
+    onClick: e => handleOpenEditModal(item, e),
+    className: "px-2.5 py-1 bg-gray-200 text-gray-700 rounded font-bold"
+  }, "수정"), /*#__PURE__*/React.createElement("button", {
+    onClick: e => handleDeleteItem(item.id, e),
+    className: "px-2 py-1 text-gray-400 hover:text-red-600 rounded font-bold",
+    title: "삭제"
+  }, "🗑️")))), getItemsByRoomName(selectedRoom).length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-gray-400 py-6 col-span-3 text-center space-y-2"
+  }, /*#__PURE__*/React.createElement("p", null, "현재 이 공간에 등록된 기기가 없습니다."), /*#__PURE__*/React.createElement("button", {
+    onClick: () => handleOpenAddModal(selectedRoom),
+    className: "px-3 py-1.5 bg-emerald-600 text-white font-bold rounded-xl text-xs inline-flex items-center gap-1 shadow-xs"
+  }, /*#__PURE__*/React.createElement("span", null, "➕"), " [", selectedRoom, "]에 첫 기기 등록하기"))))), activeTab === 'devices' && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl border border-gray-200 p-4 shadow-xs flex flex-wrap justify-between items-center gap-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-wrap items-center gap-1.5"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-xs font-bold text-gray-700 mr-1"
+  }, "공간:"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setDeviceRoomFilter('all'),
+    className: `px-2.5 py-1 text-xs font-bold rounded-lg transition ${deviceRoomFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700'}`
+  }, "전체 (", items.length, ")"), overlayLayout.map(z => /*#__PURE__*/React.createElement("button", {
+    key: z.id,
+    onClick: () => setDeviceRoomFilter(z.name),
+    className: `px-2 py-1 text-xs font-bold rounded-lg transition ${deviceRoomFilter === z.name ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'}`
+  }, z.name, " (", getItemsByRoomName(z.name).length, ")"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => handleOpenAddModal(),
+    className: "px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("span", null, "➕"), " 새 기기/수리 등록"))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-3 gap-3"
+  }, filteredDevices.map(item => {
+    const isBuiltin = item.id.startsWith('item-');
+    return /*#__PURE__*/React.createElement("div", {
+      key: item.id,
+      className: "bg-white rounded-2xl border border-gray-200 p-4 shadow-xs flex flex-col justify-between space-y-2.5"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "space-y-1.5"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex justify-between items-start"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: `text-[9px] px-2 py-0.5 rounded font-bold ${isBuiltin ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-indigo-50 text-indigo-700'}`
+    }, isBuiltin ? '✍️ 빌트인 설비' : '📱 SmartThings 가전'), /*#__PURE__*/React.createElement("span", {
+      className: `text-[9px] px-2 py-0.5 rounded font-bold ${item.status === 'good' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`
+    }, item.status === 'good' ? '정상 가동' : '점검 필요 ⚠️')), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+      className: "text-xs text-indigo-600 font-bold"
+    }, "📍 ", item.location), /*#__PURE__*/React.createElement("h4", {
+      className: "text-sm font-black text-gray-900 mt-0.5"
+    }, item.name)), /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-gray-600 space-y-1 pt-1"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex justify-between"
+    }, /*#__PURE__*/React.createElement("span", null, "브랜드:"), /*#__PURE__*/React.createElement("strong", null, item.brand)), /*#__PURE__*/React.createElement("div", {
+      className: "flex justify-between"
+    }, /*#__PURE__*/React.createElement("span", null, "모델명:"), /*#__PURE__*/React.createElement("strong", {
+      className: "font-mono"
+    }, item.modelNumber)), /*#__PURE__*/React.createElement("div", {
+      className: "flex justify-between"
+    }, /*#__PURE__*/React.createElement("span", null, "AS 연락처:"), /*#__PURE__*/React.createElement("a", {
+      href: `tel:${item.asContact}`,
+      className: "text-indigo-600 font-black underline"
+    }, "📞 ", item.asContact)), item.partDetails && /*#__PURE__*/React.createElement("div", {
+      className: "p-1.5 bg-amber-50 rounded text-amber-950 text-[11px]"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "font-bold"
+    }, "🔧 부품/필터:"), " ", item.partDetails), item.repairNotes && /*#__PURE__*/React.createElement("div", {
+      className: "p-1.5 bg-gray-50 rounded text-gray-700 text-[11px]"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "font-bold"
+    }, "📝 메모:"), " ", item.repairNotes))), /*#__PURE__*/React.createElement("div", {
+      className: "flex gap-1.5 pt-2 border-t text-xs"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => setMoveModalItem(item),
+      className: "flex-1 py-1 bg-gray-100 text-gray-800 rounded-lg font-bold"
+    }, "방 이동 ↔"), /*#__PURE__*/React.createElement("button", {
+      onClick: e => handleOpenEditModal(item, e),
+      className: "px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg font-bold"
+    }, "수정"), /*#__PURE__*/React.createElement("button", {
+      onClick: e => handleDeleteItem(item.id, e),
+      className: "px-2 py-1 text-gray-400 hover:text-red-600 rounded-lg font-bold",
+      title: "삭제"
+    }, "🗑️")));
+  }))), activeTab === 'community' && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100 border border-amber-200 rounded-2xl p-4 shadow-xs space-y-2.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col md:flex-row justify-between items-start md:items-center gap-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-2xl"
+  }, "💡"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
+    className: "text-xs sm:text-sm font-bold text-amber-950"
+  }, "이웃 주민들의 실제 집수리 · 설비 교체 · AS 해결 이력 탐색"), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-amber-800"
+  }, "환풍기, 욕조, 렌지후드, 강화마루, 누수 수리 정보를 바로 검색해보세요!"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 w-full md:w-auto justify-end"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowContactsModal(true),
+    className: "px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white text-xs font-black rounded-xl shadow-md flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement("span", null, "📞"), " 연락처 팝업 (", APARTMENT_CONTACTS.reduce((acc, g) => acc + g.items.length, 0), "개)"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-wrap gap-1 pt-1"
+  }, REPAIR_QUICK_TAGS.map(tag => {
+    const isActive = selectedRepairTag === tag.id;
+    return /*#__PURE__*/React.createElement("button", {
+      key: tag.id,
+      onClick: () => {
+        setSelectedRepairTag(tag.id);
+        if (tag.id !== 'all') setCommunityFilterCategory('all');
+      },
+      className: `px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${isActive ? 'bg-amber-800 text-white ring-2 ring-amber-600 font-black' : 'bg-white text-amber-900 border border-amber-300'}`
+    }, tag.name);
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 lg:grid-cols-2 gap-4 items-start"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl border border-gray-200 p-4 shadow-xs space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center border-b pb-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-black text-gray-900"
+  }, "📢 단지 공지사항"), /*#__PURE__*/React.createElement("span", {
+    className: "px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-bold"
+  }, filteredNotices.length, "건")), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    placeholder: "공지 검색...",
+    value: noticeSearch,
+    onChange: e => setNoticeSearch(e.target.value),
+    className: "px-2 py-1 text-xs bg-gray-50 border border-gray-300 rounded-lg w-28"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "overflow-y-auto max-h-[500px] border rounded-xl divide-y divide-gray-100"
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "w-full text-left text-xs text-gray-600"
+  }, /*#__PURE__*/React.createElement("tbody", {
+    className: "divide-y divide-gray-100"
+  }, filteredNotices.map(notice => /*#__PURE__*/React.createElement("tr", {
+    key: notice.id,
+    onClick: () => setSelectedNotice(notice),
+    className: "hover:bg-emerald-50/60 transition cursor-pointer"
+  }, /*#__PURE__*/React.createElement("td", {
+    className: "py-2 px-2.5 whitespace-nowrap"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: `px-1.5 py-0.5 rounded font-bold text-[9px] ${notice.important ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-800'}`
+  }, notice.category)), /*#__PURE__*/React.createElement("td", {
+    className: "py-2 px-2 font-bold text-gray-900 truncate max-w-[180px]"
+  }, notice.title), /*#__PURE__*/React.createElement("td", {
+    className: "py-2 px-2 text-right font-mono text-gray-400 text-[10px] whitespace-nowrap"
+  }, notice.date))))))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl border border-gray-200 p-4 shadow-xs space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center border-b pb-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-black text-gray-900"
+  }, "💬 입주민 소통 & 수리"), /*#__PURE__*/React.createElement("span", {
+    className: "px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded-full text-[10px] font-bold"
+  }, filteredCommunityPosts.length, "건")), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    placeholder: "소통글 검색...",
+    value: communitySearch,
+    onChange: e => setCommunitySearch(e.target.value),
+    className: "px-2 py-1 text-xs bg-gray-50 border border-gray-300 rounded-lg w-28"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "overflow-y-auto max-h-[500px] border rounded-xl divide-y divide-gray-100"
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "w-full text-left text-xs text-gray-600"
+  }, /*#__PURE__*/React.createElement("tbody", {
+    className: "divide-y divide-gray-100"
+  }, filteredCommunityPosts.map(post => /*#__PURE__*/React.createElement("tr", {
+    key: post.id,
+    onClick: () => setSelectedCommunityPost(post),
+    className: "hover:bg-indigo-50/60 transition cursor-pointer"
+  }, /*#__PURE__*/React.createElement("td", {
+    className: "py-2 px-2.5 whitespace-nowrap"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "px-1.5 py-0.5 rounded font-bold text-[9px] bg-indigo-50 text-indigo-700 border border-indigo-200/60"
+  }, post.category)), /*#__PURE__*/React.createElement("td", {
+    className: "py-2 px-2 font-bold text-gray-900 truncate max-w-[170px]"
+  }, post.title), /*#__PURE__*/React.createElement("td", {
+    className: "py-2 px-2 text-right font-mono text-gray-400 text-[10px] whitespace-nowrap"
+  }, post.date))))))))), activeTab === 'fees' && /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 md:grid-cols-2 gap-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-gradient-to-br from-emerald-800 to-teal-900 text-white rounded-2xl p-5 shadow-lg flex flex-col justify-between"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-[11px] text-emerald-200 font-bold px-2 py-0.5 rounded bg-white/10"
+  }, "📄 관리비 고지"), /*#__PURE__*/React.createElement("h3", {
+    className: "text-xs text-emerald-100"
+  }, feeEditForm.month), /*#__PURE__*/React.createElement("div", {
+    className: "text-2xl sm:text-3xl font-black tracking-tight"
+  }, feeEditForm.totalAmount?.toLocaleString(), " 원")), /*#__PURE__*/React.createElement("div", {
+    className: "pt-3 flex justify-between items-center border-t border-emerald-700/50"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-emerald-200 font-bold"
+  }, "확정 납부 관리"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setIsEditFeeModalOpen(true),
+    className: "px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition"
+  }, "✍️ 수정"))), /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl p-5 border border-gray-200 shadow-xs space-y-2 text-xs"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "font-bold text-gray-500 uppercase tracking-wider text-[11px]"
+  }, "단지 및 세대 등록 정보"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1 text-gray-700 text-xs"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between border-b pb-1"
+  }, /*#__PURE__*/React.createElement("span", null, "단지명:"), /*#__PURE__*/React.createElement("strong", null, INITIAL_APARTMENT_INFO.name)), /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between border-b pb-1"
+  }, /*#__PURE__*/React.createElement("span", null, "동·호수:"), /*#__PURE__*/React.createElement("strong", null, INITIAL_APARTMENT_INFO.dong, " ", INITIAL_APARTMENT_INFO.ho, " (", INITIAL_APARTMENT_INFO.unitType, ")")), /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between border-b pb-1"
+  }, /*#__PURE__*/React.createElement("span", null, "도로명:"), /*#__PURE__*/React.createElement("strong", null, INITIAL_APARTMENT_INFO.roadAddress)))))), isModalOpen && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-gray-100"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center border-b pb-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-2xl"
+  }, editingItem ? '✏️' : '➕'), /*#__PURE__*/React.createElement("h3", {
+    className: "text-base font-black text-gray-900"
+  }, editingItem ? '기기/설비 정보 수정' : '새 기기 / 수리 설비 등록')), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setIsModalOpen(false),
+    className: "text-gray-400 hover:text-gray-600 text-2xl font-bold"
+  }, "✕")), /*#__PURE__*/React.createElement("form", {
+    onSubmit: handleSaveItem,
+    className: "space-y-3 text-xs"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "기기 / 설비명 *"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    required: true,
+    value: formData.name,
+    onChange: e => setFormData({
+      ...formData,
+      name: e.target.value
+    }),
+    className: "w-full p-2.5 border border-gray-300 rounded-xl text-sm font-bold text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none",
+    placeholder: "예: 비스포크 슈드레서, 욕실 환풍기, 전동 커튼 등",
+    autoFocus: true
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "배치 공간 (방) *"), /*#__PURE__*/React.createElement("select", {
+    value: formData.location,
+    onChange: e => setFormData({
+      ...formData,
+      location: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl bg-white font-bold text-xs"
+  }, overlayLayout.map(z => /*#__PURE__*/React.createElement("option", {
+    key: z.id,
+    value: z.name
+  }, z.name)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "가동 상태"), /*#__PURE__*/React.createElement("select", {
+    value: formData.status,
+    onChange: e => setFormData({
+      ...formData,
+      status: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl bg-white font-bold text-xs"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "good"
+  }, "🟢 정상 가동 (양호)"), /*#__PURE__*/React.createElement("option", {
+    value: "warning"
+  }, "⚠️ 점검 필요 (AS 요망)")))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "제조사 / 브랜드"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    value: formData.brand,
+    onChange: e => setFormData({
+      ...formData,
+      brand: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl font-bold",
+    placeholder: "예: 삼성전자, 코콤, 힘펠"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "모델명"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    value: formData.modelNumber,
+    onChange: e => setFormData({
+      ...formData,
+      modelNumber: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl font-mono",
+    placeholder: "예: RF85T9111AP"
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "공식 AS 연락처"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    value: formData.asContact,
+    onChange: e => setFormData({
+      ...formData,
+      asContact: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl font-bold",
+    placeholder: "예: 1588-3366"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "소모품 / 교체 부품 규격"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    value: formData.partDetails,
+    onChange: e => setFormData({
+      ...formData,
+      partDetails: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl",
+    placeholder: "예: 전용 헤파필터, AA건전지 4개, 정수필터 등"
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "수리 / 자가점검 및 AS 이력 메모"), /*#__PURE__*/React.createElement("textarea", {
+    rows: "2",
+    value: formData.repairNotes,
+    onChange: e => setFormData({
+      ...formData,
+      repairNotes: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl text-xs",
+    placeholder: "예: 2026년 5월 필터 세척 완료, 다음 교체 예정일 등"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-end gap-2 pt-3 border-t"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setIsModalOpen(false),
+    className: "px-4 py-2 bg-gray-200 text-gray-800 font-bold rounded-xl text-xs"
+  }, "취소"), /*#__PURE__*/React.createElement("button", {
+    type: "submit",
+    className: "px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-md text-xs"
+  }, editingItem ? '수정 저장' : '등록 완료'))))), isAddZoneModalOpen && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center border-b pb-2"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-black text-gray-900"
+  }, "➕ 새 공간 구역 추가"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setIsAddZoneModalOpen(false),
+    className: "text-gray-400 text-xl font-bold"
+  }, "✕")), /*#__PURE__*/React.createElement("form", {
+    onSubmit: handleAddNewZone,
+    className: "space-y-3 text-xs"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "block text-gray-700 font-bold mb-1"
+  }, "공간 이름 *"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    required: true,
+    value: newZoneForm.name,
+    onChange: e => setNewZoneForm({
+      ...newZoneForm,
+      name: e.target.value
+    }),
+    className: "w-full p-2 border border-gray-300 rounded-xl text-sm font-bold",
+    placeholder: "예: 팬트리, 실외기실",
+    autoFocus: true
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-end gap-2 pt-2 border-t"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setIsAddZoneModalOpen(false),
+    className: "px-3 py-1.5 bg-gray-200 rounded-xl"
+  }, "취소"), /*#__PURE__*/React.createElement("button", {
+    type: "submit",
+    className: "px-4 py-1.5 bg-teal-600 text-white font-bold rounded-xl"
+  }, "추가하기"))))), showContactsModal && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-3xl max-w-3xl w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-start border-b pb-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
+    className: "text-base font-black text-gray-900"
+  }, "하남2지구 중흥S클래스 연락망 (", APARTMENT_CONTACTS.reduce((acc, g) => acc + g.items.length, 0), "개)"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-gray-500"
+  }, "관리사무소, 관공서, 빌트인 AS 제조사 전체 연락처")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowContactsModal(false),
+    className: "text-gray-400 text-2xl font-bold"
+  }, "✕")), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, APARTMENT_CONTACTS.map((group, gIdx) => /*#__PURE__*/React.createElement("div", {
+    key: gIdx,
+    className: "space-y-2"
+  }, /*#__PURE__*/React.createElement("h4", {
+    className: "text-xs font-bold text-gray-800 border-b pb-1"
+  }, group.group, " (", group.items.length, "개)"), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 sm:grid-cols-2 gap-2"
+  }, group.items.map((contact, cIdx) => /*#__PURE__*/React.createElement("div", {
+    key: cIdx,
+    className: "p-3 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center text-xs"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-gray-900"
+  }, contact.name), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-gray-500"
+  }, contact.desc), /*#__PURE__*/React.createElement("div", {
+    className: "font-mono text-emerald-800 font-bold pt-0.5"
+  }, contact.tel)), /*#__PURE__*/React.createElement("a", {
+    href: `tel:${contact.tel.replace(/[^0-9]/g, '')}`,
+    className: "px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold whitespace-nowrap"
+  }, "전화"))))))), /*#__PURE__*/React.createElement("div", {
+    className: "text-right pt-2 border-t"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowContactsModal(false),
+    className: "px-4 py-1.5 bg-slate-900 text-white font-bold rounded-xl text-xs"
+  }, "닫기")))), selectedNotice && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-3 max-h-[85vh] overflow-y-auto"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-start border-b pb-2"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[10px] font-bold"
+  }, selectedNotice.category), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-900 mt-1"
+  }, selectedNotice.title)), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setSelectedNotice(null),
+    className: "text-gray-400 text-xl font-bold"
+  }, "✕")), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-50 p-3 rounded-xl text-xs text-gray-800 leading-relaxed whitespace-pre-wrap"
+  }, selectedNotice.content), /*#__PURE__*/React.createElement("div", {
+    className: "text-right"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setSelectedNotice(null),
+    className: "px-4 py-1 bg-gray-200 text-gray-800 font-bold rounded-lg text-xs"
+  }, "닫기")))), selectedCommunityPost && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-3 max-h-[85vh] overflow-y-auto"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-start border-b pb-2"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded text-[10px] font-bold"
+  }, selectedCommunityPost.category), /*#__PURE__*/React.createElement("h3", {
+    className: "text-sm font-bold text-gray-900 mt-1"
+  }, selectedCommunityPost.title)), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setSelectedCommunityPost(null),
+    className: "text-gray-400 text-xl font-bold"
+  }, "✕")), /*#__PURE__*/React.createElement("div", {
+    className: "bg-gray-50 p-3 rounded-xl text-xs text-gray-800 leading-relaxed whitespace-pre-wrap"
+  }, selectedCommunityPost.content), /*#__PURE__*/React.createElement("div", {
+    className: "text-right"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setSelectedCommunityPost(null),
+    className: "px-4 py-1 bg-gray-200 text-gray-800 font-bold rounded-lg text-xs"
+  }, "닫기")))), moveModalItem && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl max-w-sm w-full p-4 shadow-2xl space-y-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-center border-b pb-2"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-xs font-bold text-gray-900"
+  }, "↔ 카드 방 이동"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setMoveModalItem(null),
+    className: "text-gray-400 font-bold"
+  }, "✕")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto"
+  }, overlayLayout.map(zone => /*#__PURE__*/React.createElement("button", {
+    key: zone.id,
+    onClick: () => moveItemToRoom(moveModalItem.id, zone.name),
+    className: `p-2 rounded-lg border text-left text-xs font-bold flex items-center gap-1.5 ${moveModalItem.location === zone.name ? 'bg-emerald-50 border-emerald-500 text-emerald-800' : 'bg-gray-50 text-gray-800'}`
+  }, /*#__PURE__*/React.createElement("span", null, zone.icon), /*#__PURE__*/React.createElement("span", {
+    className: "truncate"
+  }, zone.name)))))));
+}
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(DashboardApp));
+  </script>
+</body>
+</html>
